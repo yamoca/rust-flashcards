@@ -5,4 +5,4 @@
 - currently hardcoded for cambridge gcse latin vocab list
 
 ## todo
-- [] write logic for import and mass creation of new word (verb) structs
+[] write logic for import and mass creation of new word (verb) structs
