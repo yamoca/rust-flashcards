@@ -5,4 +5,9 @@
 - currently hardcoded for cambridge gcse latin vocab list
 
 ## todo
-[] write logic for import and mass creation of new word (verb) structs
+- [x] add boilerplate for noun/verb structs 
+- [x] create basic control flow for main functionality
+- [ ] write logic for import and mass creation of new word (verb) structs
+- [ ] finish implementing boring bits of verb tables etc
+- [ ] handle edge cases / irregulars 
+- [ ] write a front end and webserver (rocket?) to convert to web app
