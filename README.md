@@ -10,6 +10,7 @@
 - [ ] write logic for import and mass creation of new word (verb) structs
 - [ ] finish implementing boring bits of verb tables etc
 - [ ] handle edge cases / irregulars for irregulars look at no boilerplate live cat dead cat (if irregular, provide table struct or smth)
+- [ ] create cli flashcard app functionality before implementing web
 - [ ] write a front end and webserver (axum / actix-web?) to convert to web app
 
 
