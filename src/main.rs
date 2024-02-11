@@ -23,14 +23,26 @@ struct Verb {
     number: Number,
     conjugation: Conjugation,
 }
+use rand::Rng;
 
 impl Verb {
-    fn new(stem: String, translation: String, person: Person, number: Number, conjugation: Conjugation) -> Self {
+    fn new(stem: String, translation: String, conjugation: Conjugation) -> Self {
+        let rand_person = match rand::thread_rng().gen_range(0..=2) {
+            0 => Person::First,
+            1 => Person::Second,
+            2 => Person::Third,
+            _ => unreachable!()
+        };
+        let rand_number = match rand::thread_rng().gen_range(0..=1) {
+            0 => Number::Singular,
+            1 => Number::Plural,
+            _ => unreachable!()
+        };
         Verb {
             stem,
             translation,
-            person,
-            number,
+            person: rand_person,
+            number: rand_number, 
             conjugation,
         }
     }
@@ -108,27 +120,20 @@ fn fetch_translation(word: &Verb) -> String {
 
 use std::io;
 
-
 fn main() {
-    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Person::First, Number::Singular, Conjugation::First);
-    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Person::First, Number::Singular, Conjugation::Second);
-    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Person::First, Number::Singular, Conjugation::Third);
-    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Person::First, Number::Singular, Conjugation::Fourth);
-    println!("{}", fetch_latin(&porto));
-    println!("{}", fetch_latin(&moneo));
-    println!("{}", fetch_latin(&traho));
-    println!("{}", fetch_latin(&audio));
+    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(),  Conjugation::First);
+    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(),  Conjugation::Second);
+    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Conjugation::Third);
+    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Conjugation::Fourth);
+    userloop(porto, traho, moneo, audio);
 }
 
-pub fn userloop() {
-    let mut exampleword: Verb = Verb::new("mone".to_string(), "warn".to_string(), Person::First, Number::Singular, Conjugation::Second);
-    let card1: Flaschard = Flaschard::new(fetch_latin(&exampleword), fetch_translation(&exampleword));
-    exampleword.number = Number::Plural;
-    let card2: Flaschard = Flaschard::new(fetch_latin(&exampleword), fetch_translation(&exampleword));
-    exampleword.person = Person::Third;
-    let card3: Flaschard = Flaschard::new(fetch_latin(&exampleword), fetch_translation(&exampleword));
-        // habeo2, habito1, porto1, impero1, intellego3, invenio4,
-    let list: Vec<Flaschard> = vec![card1, card2, card3];
+fn userloop(porto: Verb, moneo: Verb, traho: Verb, audio: Verb) {
+    let card1 = Flaschard::new(fetch_latin(&porto), fetch_translation(&porto));
+    let card2 = Flaschard::new(fetch_latin(&moneo), fetch_translation(&moneo));
+    let card3 = Flaschard::new(fetch_latin(&traho), fetch_translation(&traho));
+    let card4 = Flaschard::new(fetch_latin(&audio), fetch_translation(&audio));
+    let list: Vec<Flaschard> = vec![card1, card2, card3, card4];
 
     for item in list {
         let mut input = String::new();
@@ -141,7 +146,9 @@ pub fn userloop() {
 
         if input.trim() == item.back {
             println!("correct");
-        }   
+        } else {
+            println!("incorrect");
+        } 
     }
 
     // let mut input = String::new();
