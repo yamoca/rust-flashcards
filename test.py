@@ -71,7 +71,12 @@ if __name__ == "__main__":
     card1_front = fetch_latin(moneo)
     card1_back = fetch_translation(moneo)
 
-    user_input = input(f"{card1_front}\n")
+    array = [[card1_front, card1_back]]
+    array.append([fetch_latin(Verb("mone", "warn", Person.Second, Number.Singular, Tense.Present, Voice.Active, Mood.Indicative)), fetch_translation(Verb("mone", "warn", Person.Second, Number.Singular, Tense.Present, Voice.Active, Mood.Indicative))])
+
+    for card_set in array:
+        user_input = input(card_set[0]) 
+
+        if user_input.strip() == card_set[1]:
+            print("correct")
     
-    if user_input.strip() == card1_back:
-        print("correct")
