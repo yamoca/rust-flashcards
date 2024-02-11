@@ -97,11 +97,25 @@ fn fetch_translation(word: &Verb) -> String {
     }
 }
 
+use std::io;
+
 
 pub fn main() {
-    println!("hello world");
-
     let moneo: Verb = Verb::new("mone".to_string(), "warn".to_string(), Person::First, Number::Singular, Tense::Present, Voice::Active, Mood::Indicative);
     let card1: Flaschard = Flaschard::new(fetch_latin(&moneo), fetch_translation(&moneo), false);
-    println!("{:#?}", card1);
+
+    let mut input = String::new();
+    // let mut list: Vec<Flaschard> = vec![card1];
+    println!("{}", card1.front);
+    match io::stdin().read_line(&mut input) {
+        Ok(_) => (),
+        Err(error) => eprintln!("error reading input: {}", error)
+    }
+
+    if input.trim() == card1.back {
+        println!("correct");
+    }
+    // println!("{:#?}", card1);
+
+
 }

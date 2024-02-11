@@ -47,33 +47,29 @@
 //ignore nouns for now practice with verbs instead
 mod verb;
 
-use std::net::SocketAddr;
+// use std::net::SocketAddr;
 
-use axum::response::Html;
-use axum::Router;
-use axum::routing::get;
+// use axum::response::Html;
+// use axum::Router;
+// use axum::routing::get;
 
-#[tokio::main]
-async fn main() {
-    let routes_hello = Router::new().route(
-        "/hello",
-        get(|| async { Html("Hello World")})
-    );
+// #[tokio::main]
+fn main() {
+    // let routes_hello = Router::new().route(
+    //     "/hello",
+    //     get(|| async { Html("Hello World")})
+    // );
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-    println!("->> LISTENING on {:?}\n", addr);
+    // let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    // println!("->> LISTENING on {:?}\n", addr);
 
-    axum::Server::bind(&addr)
-        .serve(routes_hello.into_make_service())
-        .await
-        .unwrap();
+    // axum::Server::bind(&addr)
+    //     .serve(routes_hello.into_make_service())
+    //     .await
+    //     .unwrap();
 
 
     //let servus = Noun::new("serv".to_string(), Number::Singular, Declension::First, Gender::Masculine);
     
     verb::main();
-    // match servus.number {
-    //     Number::Singular => println!("singular noun"),
-    //     Number::Plural => println!("plural noun"),
-    // }
 }
