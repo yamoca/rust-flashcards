@@ -22,5 +22,16 @@ for axum backend docs/tutorials see axum/examples/
     - static-file-server
     - todos
 
+check excel spreadsheets
+new plan:
+create sql database for words
+latinword, prestranslation, perftranslation, imperftranslation, pluperftranslation, futtranslation
+use this and preexisting latin rust logic to generate latin (place into db too? - but dont remove logic as new words may need to be added)
+can elliminate "word" struct
+keep flashcard struct - each flashcard has a front and back, and number, person, tense etc depending on word type 
+there is a flaschard for each word ?
+a flashcard has random attributes, and queries db to get its latin (front) and english (back) translations 
+
+
 
 reference this later https://latinwordnet.exeter.ac.uk/api
