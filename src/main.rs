@@ -179,27 +179,43 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
 
 
 fn fetch_translation(word: &Verb) -> String {
-    match word.number {
-        Number::Singular => match word.person {
-            Person::First => format!("i {}", word.translation),
-            Person::Second => format!("you {}", word.translation),
-            Person::Third => format!("he {}", word.translation),
-        },
-        Number::Plural => match word.person {
-            Person::First => format!("we {}", word.translation),
-            Person::Second => format!("you pl {}", word.translation),
-            Person::Third => format!("they {}", word.translation),
-        },
+    match word.tense {
+        Tense::Present => match word.number {
+            Number::Singular => match word.person {
+                Person::First => format!("i {}", word.translation),
+                Person::Second => format!("you {}", word.translation),
+                Person::Third => format!("he {}{}", word.translation, "s"),
+            },
+            Number::Plural => match word.person {
+                Person::First => format!("we {}", word.translation),
+                Person::Second => format!("you pl {}", word.translation),
+                Person::Third => format!("they {}", word.translation),
+            },
+        }
+        Tense::Imperfect => match word.number {
+            Number::Singular => match word.person {
+                Person::First => format!("i was {}{}", word.translation, "ing"),
+                Person::Second => format!("you were {}{}", word.translation, "ing"),
+                Person::Third => format!("he was {}{}", word.translation, "ing"),
+            },
+            Number::Plural => match word.person {
+                Person::First => format!("we were {}{}", word.translation, "ing"),
+                Person::Second => format!("you were pl {}{}", word.translation, "ing"),
+                Person::Third => format!("they were {}{}", word.translation, "ing"),
+            },
+        }
+        Tense::Perfect =>  todo!(),
     }
+    
 }
 
 use std::io;
 
 fn main() {
-    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Perfect, Conjugation::First);
-    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Perfect, Conjugation::Second);
-    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Perfect, Conjugation::Third);
-    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Perfect, Conjugation::Fourth);
+    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Present, Conjugation::First);
+    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Present, Conjugation::Second);
+    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Present, Conjugation::Third);
+    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Present, Conjugation::Fourth);
     userloop(porto, traho, moneo, audio);
 }
 
