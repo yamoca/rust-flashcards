@@ -8,6 +8,12 @@ enum Number {
     Plural,
 }
 
+enum Tense {
+    Present,
+    Perfect,
+    Imperfect,
+}
+
 enum Conjugation {
     First,
     Second,
@@ -19,6 +25,7 @@ enum Conjugation {
 struct Verb {
     stem: String,
     translation: String,
+    tense: Tense,
     person: Person,
     number: Number,
     conjugation: Conjugation,
@@ -26,7 +33,7 @@ struct Verb {
 use rand::Rng;
 
 impl Verb {
-    fn new(stem: String, translation: String, conjugation: Conjugation) -> Self {
+    fn new(stem: String, translation: String, tense: Tense, conjugation: Conjugation) -> Self {
         let rand_person = match rand::thread_rng().gen_range(0..=2) {
             0 => Person::First,
             1 => Person::Second,
@@ -41,6 +48,7 @@ impl Verb {
         Verb {
             stem,
             translation,
+            tense,
             person: rand_person,
             number: rand_number, 
             conjugation,
@@ -63,9 +71,10 @@ impl Flaschard {
     }
 }
 
-
-fn fetch_latin(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
+fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
+    // step one: create root word e.g port goes to porta (in most cases)
     let mut res = word.stem.to_string();
+    
     match word.conjugation {
         Conjugation::First => {
             if let (Number::Singular, Person::First) = (&word.number, &word.person) {
@@ -86,21 +95,57 @@ fn fetch_latin(word: &Verb) -> String { // must borrow verb as do not want to gi
         }
         Conjugation::Fifth => res.push_str("todo"),
     };
-    //temporarily presume all verbs are active, indicative, present tense
-    match word.number {
-        Number::Singular => match word.person {
-            Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
-            Person::Second => res.push('s'),
-            Person::Third => res.push('t'),
+    // next step
+    apply_tense(word, res)
+}
+
+fn apply_tense(word: &Verb, mut res: String) -> String {
+    match word.tense {
+        Tense::Present => match word.number {
+            Number::Singular => match word.person {
+                Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
+                Person::Second => res.push('s'),
+                Person::Third => res.push('t'),
+            },
+            Number::Plural => match word.person {
+                Person::First => res.push_str("mus"),
+                Person::Second => res.push_str("tis"),
+                Person::Third => res.push_str("nt"),
+            },
         },
-        Number::Plural => match word.person {
-            Person::First => res.push_str("mus"),
-            Person::Second => res.push_str("tis"),
-            Person::Third => res.push_str("nt"),
+        Tense::Imperfect => match word.number {
+            Number::Singular => match word.person {
+                Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
+                Person::Second => res.push('s'),
+                Person::Third => res.push('t'),
+            },
+            Number::Plural => match word.person {
+                Person::First => res.push_str("mus"),
+                Person::Second => res.push_str("tis"),
+                Person::Third => res.push_str("nt"),
+            },
         },
-    };
+        Tense::Perfect => match word.number {
+            Number::Singular => match word.person {
+                Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
+                Person::Second => res.push('s'),
+                Person::Third => res.push('t'),
+            },
+            Number::Plural => match word.person {
+                Person::First => res.push_str("mus"),
+                Person::Second => res.push_str("tis"),
+                Person::Third => res.push_str("nt"),
+            },
+        },
+    }
+    
+
+
     res
 }
+
+
+
 
 
 fn fetch_translation(word: &Verb) -> String {
@@ -121,18 +166,18 @@ fn fetch_translation(word: &Verb) -> String {
 use std::io;
 
 fn main() {
-    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(),  Conjugation::First);
-    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(),  Conjugation::Second);
-    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Conjugation::Third);
-    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Conjugation::Fourth);
+    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Present, Conjugation::First);
+    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Present, Conjugation::Second);
+    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Present, Conjugation::Third);
+    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Present, Conjugation::Fourth);
     userloop(porto, traho, moneo, audio);
 }
 
 fn userloop(porto: Verb, moneo: Verb, traho: Verb, audio: Verb) {
-    let card1 = Flaschard::new(fetch_latin(&porto), fetch_translation(&porto));
-    let card2 = Flaschard::new(fetch_latin(&moneo), fetch_translation(&moneo));
-    let card3 = Flaschard::new(fetch_latin(&traho), fetch_translation(&traho));
-    let card4 = Flaschard::new(fetch_latin(&audio), fetch_translation(&audio));
+    let card1 = Flaschard::new(create_root(&porto), fetch_translation(&porto));
+    let card2 = Flaschard::new(create_root(&moneo), fetch_translation(&moneo));
+    let card3 = Flaschard::new(create_root(&traho), fetch_translation(&traho));
+    let card4 = Flaschard::new(create_root(&audio), fetch_translation(&audio));
     let list: Vec<Flaschard> = vec![card1, card2, card3, card4];
 
     for item in list {
@@ -148,6 +193,7 @@ fn userloop(porto: Verb, moneo: Verb, traho: Verb, audio: Verb) {
             println!("correct");
         } else {
             println!("incorrect");
+            println!("correct answer: {}", item.back);
         } 
     }
 
@@ -164,3 +210,7 @@ fn userloop(porto: Verb, moneo: Verb, traho: Verb, audio: Verb) {
 
 
 }
+
+// today: get better way to manage and create words and flashcards and card stack (card stack is name of vector)
+//    smash out tenses     
+// for "he" (3rd person singular), translation is incorrect - must add -s to words e.g he warns
