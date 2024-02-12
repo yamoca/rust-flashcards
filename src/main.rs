@@ -74,27 +74,57 @@ impl Flaschard {
 fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
     // step one: create root word e.g port goes to porta (in most cases)
     let mut res = word.stem.to_string();
-    
-    match word.conjugation {
-        Conjugation::First => {
-            if let (Number::Singular, Person::First) = (&word.number, &word.person) {
-                // No modification needed for unchanged case
-            } else {
-                res.push('a');
-            }
-        } 
-        Conjugation::Second => res.push('e'),
-        Conjugation::Third => match (&word.number, &word.person) {
-            (Number::Singular, Person::First) => res.push('h'),
-            (Number::Plural, Person::Third) => res.push_str("hu"),
-            _ => res.push_str("hi"),
+
+    match word.tense {
+        Tense::Present => {
+            match word.conjugation {
+                Conjugation::First => {
+                    if let (Number::Singular, Person::First) = (&word.number, &word.person) {
+                        // No modification needed for unchanged case
+                    } else {
+                        res.push('a');
+                    }
+                } 
+                Conjugation::Second => res.push('e'),
+                Conjugation::Third => match (&word.number, &word.person) {
+                    (Number::Singular, Person::First) => res.push('h'),
+                    (Number::Plural, Person::Third) => res.push_str("hu"),
+                    _ => res.push_str("hi"),
+                },
+                Conjugation::Fourth => match (&word.number, &word.person) {
+                    (Number::Plural, Person::Third) => res.push_str("iu"),
+                    _ => res.push('i'),
+                }
+                Conjugation::Fifth => todo!(),
+            };
+
         },
-        Conjugation::Fourth => match (&word.number, &word.person) {
-            (Number::Plural, Person::Third) => res.push_str("iu"),
-            _ => res.push('i'),
-        }
-        Conjugation::Fifth => res.push_str("todo"),
+        Tense::Imperfect => {
+            match word.conjugation {
+                Conjugation::First => res.push('a'),
+                Conjugation::Second => res.push('e'),
+                Conjugation::Third => res.push_str("he"),
+                Conjugation::Fourth => res.push_str("ie"),
+                Conjugation::Fifth => todo!(),
+            };
+        },
+        Tense::Perfect => {
+            match word.conjugation {
+                Conjugation::First => res.push_str("av"),
+                Conjugation::Second => res.push('u'),
+                Conjugation::Third => res.push('x'),
+                Conjugation::Fourth => {
+                    if let (Number::Singular, Person::First) = (&word.number, &word.person) {
+                        res.push('v')
+                    } else {
+                        res.push_str("iv")
+                    }
+                } 
+                Conjugation::Fifth => todo!(),
+            }
+        },
     };
+    
     // next step
     apply_tense(word, res)
 }
@@ -115,26 +145,26 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
         },
         Tense::Imperfect => match word.number {
             Number::Singular => match word.person {
-                Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
-                Person::Second => res.push('s'),
-                Person::Third => res.push('t'),
+                Person::First => res.push_str("bam"),  //weird rust string stuff (see fetch_translation() for explanation)
+                Person::Second => res.push_str("bas"),
+                Person::Third => res.push_str("bat"),
             },
             Number::Plural => match word.person {
-                Person::First => res.push_str("mus"),
-                Person::Second => res.push_str("tis"),
-                Person::Third => res.push_str("nt"),
+                Person::First => res.push_str("bamus"),
+                Person::Second => res.push_str("batis"),
+                Person::Third => res.push_str("bant"),
             },
         },
         Tense::Perfect => match word.number {
             Number::Singular => match word.person {
-                Person::First => res.push('o'),  //weird rust string stuff (see fetch_translation() for explanation)
-                Person::Second => res.push('s'),
-                Person::Third => res.push('t'),
+                Person::First => res.push('i'),  //weird rust string stuff (see fetch_translation() for explanation)
+                Person::Second => res.push_str("isti"),
+                Person::Third => res.push_str("it"),
             },
             Number::Plural => match word.person {
-                Person::First => res.push_str("mus"),
-                Person::Second => res.push_str("tis"),
-                Person::Third => res.push_str("nt"),
+                Person::First => res.push_str("imus"),
+                Person::Second => res.push_str("istis"),
+                Person::Third => res.push_str("erunt"),
             },
         },
     }
@@ -151,14 +181,14 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
 fn fetch_translation(word: &Verb) -> String {
     match word.number {
         Number::Singular => match word.person {
-            Person::First => "i ".to_string() + &word.translation, //weird rust string stuff. to use "+" first input must be String and second input must be &str
-            Person::Second => "you ".to_string() + &word.translation,
-            Person::Third => "he ".to_string() + &word.translation, 
+            Person::First => format!("i {}", word.translation),
+            Person::Second => format!("you {}", word.translation),
+            Person::Third => format!("he {}", word.translation),
         },
         Number::Plural => match word.person {
-            Person::First => "we ".to_string() + &word.translation,
-            Person::Second => "you (pl) ".to_string() + &word.translation,
-            Person::Third => "they ".to_string() + &word.translation,
+            Person::First => format!("we {}", word.translation),
+            Person::Second => format!("you pl {}", word.translation),
+            Person::Third => format!("they {}", word.translation),
         },
     }
 }
@@ -166,10 +196,10 @@ fn fetch_translation(word: &Verb) -> String {
 use std::io;
 
 fn main() {
-    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Present, Conjugation::First);
-    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Present, Conjugation::Second);
-    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Present, Conjugation::Third);
-    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Present, Conjugation::Fourth);
+    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Perfect, Conjugation::First);
+    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Perfect, Conjugation::Second);
+    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Perfect, Conjugation::Third);
+    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Perfect, Conjugation::Fourth);
     userloop(porto, traho, moneo, audio);
 }
 

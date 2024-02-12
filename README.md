@@ -21,3 +21,6 @@ for axum backend docs/tutorials see axum/examples/
     - routes-and-handlers-close-together
     - static-file-server
     - todos
+
+
+reference this later https://latinwordnet.exeter.ac.uk/api
