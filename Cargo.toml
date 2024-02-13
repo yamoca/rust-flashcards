@@ -9,3 +9,4 @@ edition = "2021"
 tokio = { version = "1.35.1", features = ["full"] }
 axum = "0.6"
 rand = "0.8.5"
+rusqlite = { version = "0.30.0", features = ["bundled"] }

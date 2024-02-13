@@ -30,6 +30,7 @@ struct Verb {
     number: Number,
     conjugation: Conjugation,
 }
+use axum::extract::ConnectInfo;
 use rand::Rng;
 
 impl Verb {
@@ -210,8 +211,13 @@ fn fetch_translation(word: &Verb) -> String {
 }
 
 use std::io;
+mod db;
 
-fn main() {
+fn main() { 
+    db::main();
+}
+
+fn runflashcards() {
     let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Present, Conjugation::First);
     let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Present, Conjugation::Second);
     let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Present, Conjugation::Third);
