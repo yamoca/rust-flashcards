@@ -81,9 +81,8 @@ impl Flaschard {
 
 fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
     // step one: create root word e.g port goes to porta (in most cases)
-    let principle_parts = word.principle_parts;
-
-
+    let mut principle_parts = word.principle_parts.clone();
+    let mut stem = String::new();
 
     // come back to. diff forms have diff stems (perfect vs others - see principle parts)
 
@@ -93,7 +92,7 @@ fn create_root(word: &Verb) -> String { // must borrow verb as do not want to gi
     match word.tense {
         Tense::Present => {
             principle_parts[0].pop(); // removes last letter from first principle part e.g porto -> port, moneo -> mone
-            let mut stem = principle_parts[0];
+            stem = principle_parts[0].clone();
 
             match word.conjugation {
                 Conjugation::First => {
@@ -118,8 +117,9 @@ fn create_root(word: &Verb) -> String { // must borrow verb as do not want to gi
 
         },
         Tense::Imperfect => {
+            // imperfect is fine to scipt cause its regular like first principle part
             principle_parts[0].pop(); // removes last letter from first principle part e.g porto -> port, moneo -> mone
-            let mut stem = principle_parts[0]; // imperfect uses the first principle part
+            stem = principle_parts[0].clone(); // imperfect uses the first principle part
 
             match word.conjugation {
                 Conjugation::First => stem.push('a'),
@@ -130,22 +130,24 @@ fn create_root(word: &Verb) -> String { // must borrow verb as do not want to gi
             };
         },
         Tense::Perfect => {
-            match word.conjugation {
-                Conjugation::First => stem.push_str("av"),
-                Conjugation::Second => stem.push('u'),
-                Conjugation::Third => stem.push('x'),
-                Conjugation::Fourth => {
-                    if let (Number::Singular, Person::First) = (&word.number, &word.person) {
-                        stem.push('v')
-                    } else {
-                        stem.push_str("iv")
-                    }
-                } 
-                Conjugation::Fifth => todo!(),
-            }
+            principle_parts[2].pop(); // perfect is 3rd principle part
+            stem = principle_parts[2].clone(); // just remove last letter - portavi -> portav, traxi -> trax
+
+            // match word.conjugation {
+            //     Conjugation::First => stem.push_str("av"),
+            //     Conjugation::Second => stem.push('u'),
+            //     Conjugation::Third => stem.push('x'),
+            //     Conjugation::Fourth => {
+            //         if let (Number::Singular, Person::First) = (&word.number, &word.person) {
+            //             stem.push('v')
+            //         } else {
+            //             stem.push_str("iv")
+            //         }
+            //     } 
+            //     Conjugation::Fifth => todo!(),
+            // }
         },
     };
-    
     // next step
     apply_tense(word, stem)
 }
