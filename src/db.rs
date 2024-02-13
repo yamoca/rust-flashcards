@@ -5,14 +5,14 @@ use crate::Tense;
 pub fn main() {
     let queryword = "carry";
     
-    match get_conjugated_english(Tense::Imperfect, queryword) {
+    match get_conjugated_english(&Tense::Imperfect, queryword) {
         Ok(res) => println!("imperfect of {} is {}", queryword, res),
         Err(err) => eprintln!("error: {}", err),
     }
 }
 
 
-fn get_conjugated_english(tense: Tense, word: &str) -> Result<String> {
+pub fn get_conjugated_english(tense: &Tense, word: &str) -> Result<String> {
     let conn = Connection::open("output_database.sqlite")?;
 
     let columnname = match tense {

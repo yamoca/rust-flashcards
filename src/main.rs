@@ -1,19 +1,25 @@
+
+#[derive(Debug)]
 enum Person {
     First,
     Second,
     Third,
 }
+
+#[derive(Debug)]
 enum Number {
     Singular,
     Plural,
 }
 
+#[derive(Debug)]
 enum Tense {
     Present,
     Perfect,
     Imperfect,
 }
 
+#[derive(Debug)]
 enum Conjugation {
     First,
     Second,
@@ -22,6 +28,7 @@ enum Conjugation {
     Fifth,
 }
 
+#[derive(Debug)]
 struct Verb {
     stem: String,
     translation: String,
@@ -30,7 +37,7 @@ struct Verb {
     number: Number,
     conjugation: Conjugation,
 }
-use axum::extract::ConnectInfo;
+use db::get_conjugated_english;
 use rand::Rng;
 
 impl Verb {
@@ -179,34 +186,43 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
 
 
 
-fn fetch_translation(word: &Verb) -> String {
-    match word.tense {
+fn fetch_translation(word: &Verb) -> Result<String, ()> {
+    let participle = match get_conjugated_english(&word.tense, word.translation.as_str()) {
+        Ok(participle) => participle,
+        Err(err) => {
+            eprintln!("error generating english participle: {}", err);
+            return Err(())
+        }
+    };
+    let res = match word.tense {
         Tense::Present => match word.number {
             Number::Singular => match word.person {
-                Person::First => format!("i {}", word.translation),
-                Person::Second => format!("you {}", word.translation),
-                Person::Third => format!("he {}{}", word.translation, "s"),
+                Person::First => format!("i {}", participle),
+                Person::Second => format!("you {}", participle),
+                Person::Third => format!("he {}{}", participle, "s"), //goofy ahh third person singular in english
             },
             Number::Plural => match word.person {
-                Person::First => format!("we {}", word.translation),
-                Person::Second => format!("you pl {}", word.translation),
-                Person::Third => format!("they {}", word.translation),
+                Person::First => format!("we {}", participle),
+                Person::Second => format!("you pl {}", participle),
+                Person::Third => format!("they {}", participle),
             },
         }
         Tense::Imperfect => match word.number {
             Number::Singular => match word.person {
-                Person::First => format!("i was {}{}", word.translation, "ing"),
-                Person::Second => format!("you were {}{}", word.translation, "ing"),
-                Person::Third => format!("he was {}{}", word.translation, "ing"),
+                Person::First => format!("i was {}", participle),
+                Person::Second => format!("you were {}", participle),
+                Person::Third => format!("he was {}", participle),
             },
             Number::Plural => match word.person {
-                Person::First => format!("we were {}{}", word.translation, "ing"),
-                Person::Second => format!("you were pl {}{}", word.translation, "ing"),
-                Person::Third => format!("they were {}{}", word.translation, "ing"),
+                Person::First => format!("we were {}", participle),
+                Person::Second => format!("you pl were {}", participle),
+                Person::Third => format!("they were {}", participle),
             },
         }
         Tense::Perfect =>  todo!(),
-    }
+    };
+
+    Ok(res)
     
 }
 
@@ -215,37 +231,48 @@ mod db;
 
 fn main() { 
     db::main();
+    runflashcards();
 }
 
 fn runflashcards() {
-    let porto: Verb = Verb::new("port".to_string(), "carry".to_string(), Tense::Present, Conjugation::First);
-    let moneo: Verb = Verb::new("mon".to_string(), "warn".to_string(), Tense::Present, Conjugation::Second);
-    let traho: Verb = Verb::new("tra".to_string(), "drag".to_string(), Tense::Present, Conjugation::Third);
-    let audio: Verb = Verb::new("aud".to_string(), "hear".to_string(), Tense::Present, Conjugation::Fourth);
-    userloop(porto, traho, moneo, audio);
+    let words = vec![
+        Verb::new("port".to_string(), "carry".to_string(), Tense::Imperfect, Conjugation::First),
+        Verb::new("mon".to_string(), "warn".to_string(), Tense::Imperfect, Conjugation::Second),
+        Verb::new("tra".to_string(), "drag".to_string(), Tense::Imperfect, Conjugation::Third),
+        Verb::new("aud".to_string(), "hear".to_string(), Tense::Imperfect, Conjugation::Fourth),
+    ];
+    userloop(words);
 }
 
-fn userloop(porto: Verb, moneo: Verb, traho: Verb, audio: Verb) {
-    let card1 = Flaschard::new(create_root(&porto), fetch_translation(&porto));
-    let card2 = Flaschard::new(create_root(&moneo), fetch_translation(&moneo));
-    let card3 = Flaschard::new(create_root(&traho), fetch_translation(&traho));
-    let card4 = Flaschard::new(create_root(&audio), fetch_translation(&audio));
-    let list: Vec<Flaschard> = vec![card1, card2, card3, card4];
+fn userloop(words: Vec<Verb>) {
+    let mut deck: Vec<Flaschard> = Vec::new();
 
-    for item in list {
+    for word in words {
+        match fetch_translation(&word) {
+            Ok(translation) => {
+                deck.push(Flaschard::new(create_root(&word), translation))
+            }
+            Err(()) => {
+                eprintln!("failed to fetch translation for {:?}", word)
+            }
+        }
+    }
+    
+
+    for card in deck {
         let mut input = String::new();
 
-        println!("{}", item.front);
+        println!("{}", card.front);
         match io::stdin().read_line(&mut input) {
             Ok(_) => (),
             Err(error) => eprintln!("error reading input: {}", error)
         }
 
-        if input.trim() == item.back {
+        if input.trim() == card.back {
             println!("correct");
         } else {
             println!("incorrect");
-            println!("correct answer: {}", item.back);
+            println!("correct answer: {}", card.back);
         } 
     }
 
