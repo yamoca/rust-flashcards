@@ -34,4 +34,15 @@ a flashcard has random attributes, and queries db to get its latin (front) and e
 
 
 
+https://mk270.github.io/whitakers-words/
+
+could theoretically create a mass database by webscraping wiktionary
+https://en.wiktionary.org/w/index.php?title=Category:Latin_second_conjugation_verbs&pagefrom=DUABUS+SELLIS+SEDEO%0Aduabus+sellis+sedeo#mw-pages
 reference this later https://latinwordnet.exeter.ac.uk/api
+
+
+
+WHITTAKERS WORDS
+defo way forward (see above link and github link)
+/blob/master/INFLECTS.LAT contains endings for ALL verbs 
+try and figure out how to reverse process (i.e at the moment, program takes word as input and ouputs attributes of that word whereas i want to use attributes of word as input and word infleciton as output)
