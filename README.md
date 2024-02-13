@@ -13,6 +13,9 @@
 - [ ] create cli flashcard app functionality before implementing web
 - [ ] write a front end and webserver (axum / actix-web?) to convert to web app
 
+IMPLEMENT WEB BEFORE IMPLEMENTING EVERYTHING EXTRA FEATURES (IE NOW)
+    - create mvp and get feedback from customers (ms douglas) asap
+    - iterate fast
 
 ### notes
 
