@@ -82,7 +82,7 @@ impl Flaschard {
 fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
     // step one: create root word e.g port goes to porta (in most cases)
     let mut principle_parts = word.principle_parts.clone();
-    let mut stem = String::new();
+    let mut stem ;
 
     // come back to. diff forms have diff stems (perfect vs others - see principle parts)
 
