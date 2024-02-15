@@ -1,26 +1,26 @@
 
 #[derive(Debug)]
-enum Person {
+pub(crate) enum Person {
     First,
     Second,
     Third,
 }
 
 #[derive(Debug)]
-enum Number {
+pub(crate) enum Number {
     Singular,
     Plural,
 }
 
 #[derive(Debug)]
-enum Tense {
+pub(crate) enum Tense {
     Present,
     Perfect,
     Imperfect,
 }
 
 #[derive(Debug)]
-enum Conjugation {
+pub(crate) enum Conjugation {
     First,
     Second,
     Third,
@@ -29,7 +29,7 @@ enum Conjugation {
 }
 
 #[derive(Debug)]
-struct Verb {
+pub(crate) struct Verb {
     principle_parts: Vec<String>,
     translation: String,
     tense: Tense,
@@ -37,11 +37,33 @@ struct Verb {
     number: Number,
     conjugation: Conjugation,
 }
-use db::get_conjugated_english;
 use rand::Rng;
 
+use rusqlite::{Connection, Result};
+use serde::{Deserialize, Serialize};
+
+pub fn get_conjugated_english(tense: &Tense, word: &str) -> Result<String> {
+    let conn = Connection::open("output_database.sqlite")?;
+
+    let columnname = match tense {
+        Tense::Present => "present_tense",
+        Tense::Perfect => "perfect_tense",
+        Tense::Imperfect => "imperfect_tense",
+    };
+
+    let sqlquery = format!("SELECT {} FROM data WHERE present_tense=?1", columnname);
+    let mut stmt = conn.prepare(&sqlquery)?;
+
+    let res: String = stmt.query_row([&word], |row| {
+        row.get(0)
+    })?;
+
+    Ok(res)
+}
+// get translation and fetch root etc should be functions within the verb struct (or flaschard struct?)
+// dont like having a verb struct seperate from flaschard stuct - its annoying but probs good to have data seperation?
 impl Verb {
-    fn new(principle_parts: Vec<String>, translation: String, tense: Tense, conjugation: Conjugation) -> Self {
+    pub(crate) fn new(principle_parts: Vec<String>, translation: String, tense: Tense, conjugation: Conjugation) -> Self {
         let rand_person = match rand::thread_rng().gen_range(0..=2) {
             0 => Person::First,
             1 => Person::Second,
@@ -64,22 +86,24 @@ impl Verb {
     }
 }
 
-#[derive(Debug)]
-struct Flaschard {
-    front: String,
-    back: String,
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub(crate) struct Flaschard {
+    pub id: i32,
+    pub front: String,
+    pub back: String,
 }
 
 impl Flaschard {
-    fn new(front: String, back: String) -> Self {
+    pub fn new(front: String, back: String, id: i32) -> Self {
         Flaschard {
             front,
             back,
+            id,
         } 
     }
 }
 
-fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
+pub fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
     // step one: create root word e.g port goes to porta (in most cases)
     let mut principle_parts = word.principle_parts.clone();
     let mut stem ;
@@ -152,7 +176,7 @@ fn create_root(word: &Verb) -> String { // must borrow verb as do not want to gi
     apply_tense(word, stem)
 }
 
-fn apply_tense(word: &Verb, mut res: String) -> String {
+pub fn apply_tense(word: &Verb, mut res: String) -> String {
     match word.tense {
         Tense::Present => match word.number {
             Number::Singular => match word.person {
@@ -201,7 +225,7 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
 
 
 //english
-fn fetch_translation(word: &Verb) -> Result<String, ()> {
+pub fn fetch_translation(word: &Verb) -> Result<String, ()> {
     let participle = match get_conjugated_english(&word.tense, word.translation.as_str()) {
         Ok(participle) => participle,
         Err(err) => {
@@ -254,10 +278,8 @@ fn fetch_translation(word: &Verb) -> Result<String, ()> {
 }
 
 use std::io;
-mod db;
 
 fn main() { 
-    db::main();
     runflashcards();
 }
 
@@ -277,7 +299,7 @@ fn userloop(words: Vec<Verb>) {
     for word in words {
         match fetch_translation(&word) {
             Ok(translation) => {
-                deck.push(Flaschard::new(create_root(&word), translation))
+                deck.push(Flaschard::new(create_root(&word), translation, 1))
             }
             Err(()) => {
                 eprintln!("failed to fetch translation for {:?}", word)
