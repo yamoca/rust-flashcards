@@ -35,7 +35,8 @@ keep flashcard struct - each flashcard has a front and back, and number, person,
 there is a flaschard for each word ?
 a flashcard has random attributes, and queries db to get its latin (front) and english (back) translations 
 
-
+need to use rwlock and mutex to get around "the trait bound..."
+look at rust book rc<t> and arc<t>
 
 https://mk270.github.io/whitakers-words/
 

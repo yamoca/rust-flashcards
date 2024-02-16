@@ -1,6 +1,8 @@
 <h1>Flaschard</h1>
 <div>
     {% for flashcard in flashcards %}
-        <div>{{ flashcard }}</div>
+        <div>{{ flashcard.front }}</div>
+        <div>{{ flashcard.back }}</div>
+        <input type="text"\>
     {% endfor %}
 </div>

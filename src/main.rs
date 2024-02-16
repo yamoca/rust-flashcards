@@ -8,17 +8,17 @@ use askama::Template;
 
 use crate::in_memory::load_state;
 
-#[derive(Template)]
-#[template(path = "flashcards.html")]
-struct FlashcardTemplate {
-    flashcards: Vec<String>,
-}
+// #[derive(Template)]
+// #[template(path = "flashcards.html")]
+// struct FlashcardTemplate {
+//     flashcards: Vec<String>,
+// }
 
 
 #[tokio::main]
 async fn main() {
     let app = Router::new()
-        .route("/", routing::get(askama_get_flaschards))
+        .route("/", routing::get(handler))
         .merge(in_memory::rest_router())
         .layer(
             tower_http::cors::CorsLayer::new() // make sure below ip matches output of yarn dev (make sure frontend is running on correct port/ip)
@@ -39,12 +39,12 @@ struct Message {
     message: String,
 }
 
-async fn askama_get_flaschards() -> impl IntoResponse {
-    let flashcards = vec!["card 1".to_string(), "card 2".to_string()];
-    let template = FlashcardTemplate { flashcards };
-    let rendered = template.render().expect("failed to render template");
-    (StatusCode::OK, Html(rendered).into_response())
-}
+// async fn askama_get_flaschards() -> impl IntoResponse {
+//     let flashcards = vec!["card 1".to_string(), "card 2".to_string()];
+//     let template = FlashcardTemplate { flashcards };
+//     let rendered = template.render().expect("failed to render template");
+//     (StatusCode::OK, Html(rendered).into_response())
+// }
 
 
 async fn handler() -> Json<Message> {

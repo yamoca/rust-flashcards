@@ -1,15 +1,30 @@
-use axum::{extract::{Path, State}, routing::{get, patch}, Json, Router};
+use axum::{extract::{Path, State}, http::StatusCode, response::{Html, IntoResponse}, routing::{get, patch}, Json, Router};
 use serde::Deserialize;
+use askama::Template;
 use super::{state::AppState, words::Flaschard};
 
 pub(crate) fn rest_router() -> Router<AppState> {
     Router::new()
-        .route("/flashcards", get(get_flashcards))//.post(create_todo))
+        .route("/flashcards", get(askama_get_flashcards))//.post(create_todo))
         // .route("/todos/:id", patch(update_todo).delete(delete_todo))
 }
 
 async fn get_flashcards(State(state): State<AppState>) -> Json<Vec<Flaschard>> {
-    Json(state.flaschards.read().expect("lock poisoned").clone())
+    Json(state.flashcards.read().expect("lock poisoned").clone())
+}
+
+#[derive(Template)]
+#[template(path = "flashcards.html")]
+struct FlashcardTemplate<'a> {
+    flashcards: &'a Vec<Flaschard>,
+}
+
+
+async fn askama_get_flashcards(State(state): State<AppState>) -> impl IntoResponse {
+    let flashcards = state.flashcards.read().unwrap();
+    let template = FlashcardTemplate { flashcards: &flashcards };
+    let rendered = template.render().expect("failed to render template");
+    (StatusCode::OK, Html(rendered).into_response())
 }
 
 // #[derive(Deserialize)]

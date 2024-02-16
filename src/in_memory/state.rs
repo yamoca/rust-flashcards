@@ -1,6 +1,7 @@
 use super::words::{self, create_root, fetch_translation, Conjugation, Flaschard, Tense, Verb};
 use std::sync::{Arc, Mutex, RwLock};
 
+use askama::Template;
 use serde::{Deserialize, Serialize};
 
 // #[derive(Serialize, Deserialize, Clone)]
@@ -13,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone)]
 pub(crate) struct AppState {
     next_id: Arc<Mutex<i32>>, //29:00 of vid for explanation
-    pub flaschards: Arc<RwLock<Vec<Flaschard>>>, // and check rust book (somewhere under shared ownership)
+    pub flashcards: Arc<RwLock<Vec<Flaschard>>>, // and check rust book (somewhere under shared ownership)
 }
 
 impl AppState {
@@ -21,7 +22,7 @@ impl AppState {
         let max_id = flashcards.iter().map(|flashcard| flashcard.id).max().unwrap_or(0);
         Self {
             next_id: Arc::new(Mutex::new(max_id + 1)),
-            flaschards: Arc::new(RwLock::new(flashcards)),
+            flashcards: Arc::new(RwLock::new(flashcards)),
         }
     }
     pub fn get_id(&self) -> i32 {

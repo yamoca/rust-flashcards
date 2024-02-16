@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub(crate) enum Person {
     First,
@@ -37,6 +36,7 @@ pub(crate) struct Verb {
     number: Number,
     conjugation: Conjugation,
 }
+use askama::Template;
 use rand::Rng;
 
 use rusqlite::{Connection, Result};
