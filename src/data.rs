@@ -1,25 +1,27 @@
+use rand::Rng;
+
 #[derive(Debug)]
-enum Person {
+pub enum Person {
     First,
     Second,
     Third,
 }
 
 #[derive(Debug)]
-enum Number {
+pub enum Number {
     Singular,
     Plural,
 }
 
 #[derive(Debug)]
-enum Tense {
+pub enum Tense {
     Present,
     Perfect,
     Imperfect,
 }
 
 #[derive(Debug)]
-enum Conjugation {
+pub enum Conjugation {
     First,
     Second,
     Third,
@@ -28,19 +30,17 @@ enum Conjugation {
 }
 
 #[derive(Debug)]
-struct Verb {
-    principle_parts: Vec<String>,
-    translation: String,
-    tense: Tense,
-    person: Person,
-    number: Number,
-    conjugation: Conjugation,
+pub struct Verb {
+    pub principle_parts: Vec<String>,
+    pub translation: String,
+    pub tense: Tense,
+    pub person: Person,
+    pub number: Number,
+    pub conjugation: Conjugation,
 }
-use db::get_conjugated_english;
-use rand::Rng;
 
 impl Verb {
-    fn new(principle_parts: Vec<String>, translation: String, tense: Tense, conjugation: Conjugation) -> Self {
+    pub fn new(principle_parts: Vec<String>, translation: String, tense: Tense, conjugation: Conjugation) -> Self {
         let rand_person = match rand::thread_rng().gen_range(0..=2) {
             0 => Person::First,
             1 => Person::Second,
@@ -64,13 +64,13 @@ impl Verb {
 }
 
 #[derive(Debug)]
-struct Flaschard {
-    front: String,
-    back: String,
+pub struct Flaschard {
+    pub front: String,
+    pub back: String,
 }
 
 impl Flaschard {
-    fn new(front: String, back: String) -> Self {
+    pub fn new(front: String, back: String) -> Self {
         Flaschard {
             front,
             back,

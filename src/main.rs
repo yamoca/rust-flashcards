@@ -1,8 +1,12 @@
 use std::io;
-mod db;
+
+mod data;
+use data::*;
+
+mod utils;
+use utils::*;
 
 fn main() { 
-    db::main();
     runflashcards();
 }
 

@@ -1,4 +1,41 @@
-fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
+use rusqlite::{Connection, Result};
+use crate::data::*;
+
+
+// query example
+// pub fn main() {
+//     let queryword = "carry";
+    
+//     match get_conjugated_english(&Tense::Imperfect, queryword) {
+//         Ok(res) => println!("imperfect of {} is {}", queryword, res),
+//         Err(err) => eprintln!("error: {}", err),
+//     }
+// }
+
+
+pub fn get_conjugated_english(tense: &Tense, word: &str) -> Result<String> {
+    let conn = Connection::open("output_database.sqlite")?;
+
+    let columnname = match tense {
+        Tense::Present => "present_tense",
+        Tense::Perfect => "perfect_tense",
+        Tense::Imperfect => "imperfect_tense",
+    };
+
+    let sqlquery = format!("SELECT {} FROM data WHERE present_tense=?1", columnname);
+    let mut stmt = conn.prepare(&sqlquery)?;
+
+    let res: String = stmt.query_row([&word], |row| {
+        row.get(0)
+    })?;
+
+    Ok(res)
+}
+
+
+
+
+pub fn create_root(word: &Verb) -> String { // must borrow verb as do not want to give ownership to this function (otherwise verb will not be able to be used anywhere else)
     // step one: create root word e.g port goes to porta (in most cases)
     let mut principle_parts = word.principle_parts.clone();
     let mut stem = String::new();
@@ -71,7 +108,7 @@ fn create_root(word: &Verb) -> String { // must borrow verb as do not want to gi
     apply_tense(word, stem)
 }
 
-fn apply_tense(word: &Verb, mut res: String) -> String {
+pub fn apply_tense(word: &Verb, mut res: String) -> String {
     match word.tense {
         Tense::Present => match word.number {
             Number::Singular => match word.person {
@@ -120,7 +157,7 @@ fn apply_tense(word: &Verb, mut res: String) -> String {
 
 
 //english
-fn fetch_translation(word: &Verb) -> Result<String, ()> {
+pub fn fetch_translation(word: &Verb) -> Result<String, ()> {
     let participle = match get_conjugated_english(&word.tense, word.translation.as_str()) {
         Ok(participle) => participle,
         Err(err) => {
