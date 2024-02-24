@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Flashcard App</h1>
+    <div id="flashcard" style="display: block;">
+        <p id="flashcardFront">WORD</p>
+        <label for="wordInput">Write translation here:</label>
+        <input type="text" name="userAnswer" id="wordInput">
+        <button onclick="checkAnswer()">Check Answer</button>
+    </div> 
+    <div id="correct" style="display: none;">
+        <h1>Correct!</h1>
+        <h1>Well Done</h1>
+        <button onclick="nextFlashcard()">Next</button>
+    </div>
+    <div id="incorrect" style="display: none;">
+        <h1>Incorrect</h1>
+        <h1 id="correctAnswerText"></h1>
+        <button onclick="nextFlashcard()">Continue</button>
+        <!-- add incorrect word to front of stack? make user input until gets right or only once? or go quizlet way and do "rounds" (see write mode) figure out how to handle -->
+    </div>
+    <div id="finished" style="display: none;">
+        <h1>Congratulations, you finished this deck!</h1>
+        <p id="score">Correct: </p>
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <script>
+        let correctAnswer;
+        let currentFlashcardId = 0;
+        let flashcards;
+        let score = 0;
+        document.addEventListener("DOMContentLoaded", async () => {
+            const correctAnswerText = document.getElementById("correctAnswer")
+            try {
+                const response = await fetch('http://127.0.0.1:3030/flashcards');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                flashcards = data.map(({ front, back }) => ({ front, back }));
+                console.log('Flashcards:', flashcards);
+
+                flashcardFront.innerHTML = flashcards[currentFlashcardId].front;
+                const correct = null;
+                correctAnswer = flashcards[currentFlashcardId].back;
+            } catch (error) {
+                console.error('Error fetching flashcards:', error);
+            }
+
+            
+        });
+
+        const scoreText = document.getElementById("score");
+        const finishedDiv = document.getElementById("finished");
+        const flashcardDiv = document.getElementById("flashcard");
+        const flashcardFront = document.getElementById("flashcardFront");
+        const correctDiv = document.getElementById("correct");
+        const incorrectDiv = document.getElementById("incorrect");
+
+        const wordInput = document.getElementById("wordInput");
+        wordInput.addEventListener("keydown", handleKeyPress);
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                console.log("enter pressed");
+                if (flashcardDiv.style.display === "block") {
+                    // Flashcard is visible, trigger checkAnswer
+                    checkAnswer();
+                } else if (correctDiv.style.display === "block" || incorrectDiv.style.display === "block") {
+                    // Correct or Incorrect div is visible, trigger nextFlashcard
+                    nextFlashcard();
+                } else if (finishedDiv.style.display === "block") {
+                    // Finished div is visible, trigger reset
+                    reset();
+                }
+            }
+        }
+
+        function checkAnswer() {
+            flashcardDiv.style.display = "none";
+
+            const userAnswer = document.getElementById("wordInput").value;
+
+            if(userAnswer === correctAnswer) {
+                correct = true
+                correctDiv.style.display = "block";
+                score += 1;
+            } else {
+                correct = false
+                incorrectDiv.style.display = "block";
+                correctAnswerText.textContent = `Correct answer was: ${correctAnswer}`;
+            }
+        }
+        function nextFlashcard() {
+            if (!(currentFlashcardId === flashcards.length-1)) {
+                currentFlashcardId += 1;
+                correctDiv.style.display = "none";
+                incorrectDiv.style.display = "none";
+                flashcardDiv.style.display = "block";
+
+                setFlashcardTexts();
+            }
+            // got to the end
+            else {
+                console.log("finished");
+                finished()
+            } 
+            
+
+        }
+
+        function finished() {
+            correctDiv.style.display = "none";
+            incorrectDiv.style.display = "none";
+            flashcardDiv.style.display = "none";
+            finishedDiv.style.display = "block";
+            scoreText.innerHTML = `Correct: ${score}/${flashcards.length}`;
+        }
+
+        function reset() {
+            flashcardDiv.style.display = "block";
+            finishedDiv.style.display = "none";
+            currentFlashcardId = 0;
+            score = 0;
+            setFlashcardTexts();
+        }
+
+        function setFlashcardTexts() {
+            document.getElementById("wordInput").value = "";
+            flashcardFront.innerHTML = flashcards[currentFlashcardId].front;
+            correctAnswer = flashcards[currentFlashcardId].back;correctAnswer = flashcards[currentFlashcardId].back;
+        }
+
+
+
+    </script>
+
+</body>
+</html>

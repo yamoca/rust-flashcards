@@ -1,4 +1,5 @@
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub enum Person {
@@ -63,15 +64,17 @@ impl Verb {
     }
 }
 
-#[derive(Debug)]
-pub struct Flaschard {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Flashcard {
+    pub id: i32,
     pub front: String,
     pub back: String,
 }
 
-impl Flaschard {
-    pub fn new(front: String, back: String) -> Self {
-        Flaschard {
+impl Flashcard {
+    pub fn new(id: i32, front: String, back: String) -> Self {
+        Flashcard {
+            id,
             front,
             back,
         } 
