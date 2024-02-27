@@ -43,7 +43,7 @@ could theoretically create a mass database by webscraping wiktionary
 https://en.wiktionary.org/w/index.php?title=Category:Latin_second_conjugation_verbs&pagefrom=DUABUS+SELLIS+SEDEO%0Aduabus+sellis+sedeo#mw-pages
 reference this later https://latinwordnet.exeter.ac.uk/api
 
-
+https://latin.cactus2000.de/showverb.en.php?verb=manere
 
 WHITTAKERS WORDS
 defo way forward (see above link and github link)
