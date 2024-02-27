@@ -44,9 +44,55 @@ changed whitakers word inflection.tsv (tab seperated values) into a pivot table 
 tomorrow: change spreadsheet to include verb identification info as well as grammar flags (i forgot)
 write rust program to 
 get indentification (e.g conjugation etc) of a verb (using whittakers online??)
-append all the hecking inflections to the word and put them all in once big csv kinda thing (start of with og verbs porto, moneo, audio, forgot the 4th declension one)
+    append all the hecking inflections to the word and put them all in once big csv kinda thing (start of with og verbs porto, moneo, audio, forgot the 4th declension one)
+    prolly use a db  to do this for good practice?
 put into database (look into planetscale, mysql vs postreges, prisma etc)
 rock and roll
+
+# db design
+follow those principles i forgot what they were (first normal form second, third)
+therefore 
+
+### all these tables need ids (for primary key)
+
+each root / lexeme / lemma / whatever has a table (created by inflections whittakers db (aka what im working on now 27/2))
+
+e.g
+porto, portare, portavi, portatus (just using principle parts for table name atm for clearness)
+person | plurality | tense | result | translation |
+-------|-----------|-------|--------|-------------|
+1      | singular  | pres  | porto  | i carry     |
+-------|-----------|-------|--------|-------------|
+2      | singular  | pres  | portes | you carry   |
+-------|-----------|-------|--------|--------------
+
+etc etc
+
+verbs table 
+e.g
+verbs
+root   |conjugation| link |
+-------|-----------|-------
+porto  | 1         | porto table 
+-------|-----------|--------
+maneo  | 2         | maneo table
+-------|-----------|-
+traho  | 3         |  etc 
+-------|-----------|-
+audio  | 4         | etc 
+
+
+flashcard table (necessary for caching or smth??)
+or necessary for keeping track of how well someone knows a particular word (word as in lexeme / root)
+
+vocab list table (ocr gcse etc)
+
+deck doesnt need to be a table as deck is generated on the fly (using custom options)
+
+
+
+
+
 
 https://mk270.github.io/whitakers-words/
 
