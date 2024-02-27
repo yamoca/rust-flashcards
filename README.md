@@ -35,7 +35,18 @@ keep flashcard struct - each flashcard has a front and back, and number, person,
 there is a flaschard for each word ?
 a flashcard has random attributes, and queries db to get its latin (front) and english (back) translations 
 
+## 27/2
+this is kind of a devlog now for personal statement / uni whatever
+changed approach back to whitakers words cause web scraping poo poo. 
+talked to my dad about excel for 2 hours
+changed whitakers word inflection.tsv (tab seperated values) into a pivot table and filtred to just words etc
 
+tomorrow: change spreadsheet to include verb identification info as well as grammar flags (i forgot)
+write rust program to 
+get indentification (e.g conjugation etc) of a verb (using whittakers online??)
+append all the hecking inflections to the word and put them all in once big csv kinda thing (start of with og verbs porto, moneo, audio, forgot the 4th declension one)
+put into database (look into planetscale, mysql vs postreges, prisma etc)
+rock and roll
 
 https://mk270.github.io/whitakers-words/
 

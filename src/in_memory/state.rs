@@ -27,7 +27,7 @@ impl AppState {
 }
 
 pub(crate) fn load_state() -> AppState {
-    let flashcards = vec![Flashcard::new(1, "lorem".to_string(), "ipsum".to_string()), Flashcard::new(1, "deez".to_string(), "nuts".to_string())];
+    let flashcards = vec![Flashcard::new(1, "1+1".to_string(), "2".to_string()), Flashcard::new(1, "2+2".to_string(), "4".to_string())];
     
     AppState::new(flashcards)
 }
