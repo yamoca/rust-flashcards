@@ -89,8 +89,12 @@ vocab list table (ocr gcse etc)
 
 deck doesnt need to be a table as deck is generated on the fly (using custom options)
 
+# 28/2/24
 
-
+wrote python utils (with pyWORDS repo) to create csv with inflection type and variant (for later use) 
+problem of latin words meaning many different things ie puellae could be many different things (mainly noun issue)
+in terms of english translation, just have them in a database that looks similar to the latin one 
+then have a main words table which links foriegn key of latin to foreign key of english 
 
 
 
