@@ -2,8 +2,8 @@ import csv
 import sqlite3
 
 # Replace 'your_input.csv' with the actual filename
-csv_filename = 'sampledata.csv'
-db_filename = 'output_database.sqlite'
+csv_filename = 'inflections.csv'
+db_filename = 'inflections_db.sqlite'
 
 # Connect to the SQLite database
 conn = sqlite3.connect(db_filename)

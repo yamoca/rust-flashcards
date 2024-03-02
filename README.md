@@ -96,7 +96,10 @@ problem of latin words meaning many different things ie puellae could be many di
 in terms of english translation, just have them in a database that looks similar to the latin one 
 then have a main words table which links foriegn key of latin to foreign key of english 
 
-
+## 2/3
+todo convert lots of .sqlite dbs into one db with diff table names 
+need to add principle parts somewhere and lemmatize
+how to deal with deponents and words with only 3 supplied principle parts 
 
 https://mk270.github.io/whitakers-words/
 
