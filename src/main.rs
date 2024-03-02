@@ -7,7 +7,13 @@ mod business_logic;
 use crate::in_memory::load_state;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> rusqlite::Result<()> {
+
+    let conn = Connection::open("main_db.sqlite")?;
+
+    drop_table(&conn);
+
+
     let app = Router::new()
         .route("/", get(handler))
         .merge(in_memory::rest_router())
@@ -19,8 +25,17 @@ async fn main() {
     println!("server started, listening on: {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app).await.unwrap();
+
+    Ok(())
 }
 
 async fn handler() {
     println!("hello world")
+}
+
+use rusqlite::Connection;
+
+fn drop_table(conn: &Connection) -> rusqlite::Result<()> {
+    conn.execute("DROP TABLE IF EXISTS conjugations;", [])?;
+    Ok(())
 }
